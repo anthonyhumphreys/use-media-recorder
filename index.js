@@ -84,6 +84,8 @@ function useMediaRecorder({
   let [mediaBlob, setMediaBlob] = React.useState(null);
   let [isAudioMuted, setIsAudioMuted] = React.useState(false);
 
+  React.useEffect(() => console.log(mediaBlob?.size), [mediaBlob]);
+
   async function getMediaStream() {
     if (error) {
       setError(null);
