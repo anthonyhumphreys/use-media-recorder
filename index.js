@@ -1,4 +1,4 @@
-const React = require('react');
+const React = require("react");
 
 /**
  * Checks whether the argument is a valid object i.e (key-value pair).
@@ -15,11 +15,11 @@ function isObject(o) {
 function validateMediaTrackConstraints(mediaType) {
   let supportedMediaConstraints = navigator.mediaDevices.getSupportedConstraints();
   let unSupportedMediaConstraints = Object.keys(mediaType).filter(
-    constraint => !supportedMediaConstraints[constraint]
+    (constraint) => !supportedMediaConstraints[constraint]
   );
 
   if (unSupportedMediaConstraints.length !== 0) {
-    let toText = unSupportedMediaConstraints.join(',');
+    let toText = unSupportedMediaConstraints.join(",");
     console.error(
       `The following constraints ${toText} are not supported on this browser.`
     );
@@ -74,13 +74,13 @@ function useMediaRecorder({
   onError = noop,
   mediaRecorderOptions,
   onDataAvailable = noop,
-  mediaStreamConstraints = {}
+  mediaStreamConstraints = {},
 }) {
   let mediaChunks = React.useRef([]);
   let mediaStream = React.useRef(null);
   let mediaRecorder = React.useRef(null);
   let [error, setError] = React.useState(null);
-  let [status, setStatus] = React.useState('idle');
+  let [status, setStatus] = React.useState("idle");
   let [mediaBlob, setMediaBlob] = React.useState(null);
   let [isAudioMuted, setIsAudioMuted] = React.useState(false);
 
@@ -89,7 +89,7 @@ function useMediaRecorder({
       setError(null);
     }
 
-    setStatus('acquiring_media');
+    setStatus("acquiring_media");
 
     try {
       let stream;
@@ -106,25 +106,25 @@ function useMediaRecorder({
 
       if (recordScreen && mediaStreamConstraints.audio) {
         let audioStream = await window.navigator.mediaDevices.getUserMedia({
-          audio: mediaStreamConstraints.audio
+          audio: mediaStreamConstraints.audio,
         });
 
         audioStream
           .getAudioTracks()
-          .forEach(audioTrack => stream.addTrack(audioTrack));
+          .forEach((audioTrack) => stream.addTrack(audioTrack));
       }
 
       mediaStream.current = stream;
-      setStatus('ready');
+      setStatus("ready");
     } catch (err) {
       setError(err);
-      setStatus('failed');
+      setStatus("failed");
     }
   }
 
   function clearMediaStream() {
     if (mediaStream.current) {
-      mediaStream.current.getTracks().forEach(track => track.stop());
+      mediaStream.current.getTracks().forEach((track) => track.stop());
       mediaStream.current = null;
     }
   }
@@ -133,6 +133,8 @@ function useMediaRecorder({
     if (error) {
       setError(null);
     }
+
+    setMediaBlob(null);
 
     if (!mediaStream.current) {
       await getMediaStream();
@@ -144,13 +146,13 @@ function useMediaRecorder({
         mediaRecorderOptions
       );
       mediaRecorder.current.addEventListener(
-        'dataavailable',
+        "dataavailable",
         handleDataAvailable
       );
-      mediaRecorder.current.addEventListener('stop', handleStop);
-      mediaRecorder.current.addEventListener('error', handleError);
+      mediaRecorder.current.addEventListener("stop", handleStop);
+      mediaRecorder.current.addEventListener("error", handleError);
       mediaRecorder.current.start();
-      setStatus('recording');
+      setStatus("recording");
       onStart();
     }
   }
@@ -171,13 +173,13 @@ function useMediaRecorder({
     let blob = new Blob(mediaChunks.current, blobPropertyBag);
 
     setMediaBlob(blob);
-    setStatus('stopped');
+    setStatus("stopped");
     onStop(blob);
   }
 
   function handleError(e) {
     setError(e.error);
-    setStatus('idle');
+    setStatus("idle");
     onError(e.error);
   }
 
@@ -185,36 +187,36 @@ function useMediaRecorder({
     setIsAudioMuted(mute);
 
     if (mediaStream.current) {
-      mediaStream.current.getAudioTracks().forEach(audioTrack => {
+      mediaStream.current.getAudioTracks().forEach((audioTrack) => {
         audioTrack.enabled = !mute;
       });
     }
   }
 
   function pauseRecording() {
-    if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
+    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.pause();
     }
   }
 
   function resumeRecording() {
-    if (mediaRecorder.current && mediaRecorder.current.state === 'paused') {
+    if (mediaRecorder.current && mediaRecorder.current.state === "paused") {
       mediaRecorder.current.resume();
     }
   }
 
   function stopRecording() {
     if (mediaRecorder.current) {
-      setStatus('stopping');
+      setStatus("stopping");
       mediaRecorder.current.stop();
       // not sure whether to place clean up in useEffect?
       // If placed in useEffect the handler functions become dependencies of useEffect
       mediaRecorder.current.removeEventListener(
-        'dataavailable',
+        "dataavailable",
         handleDataAvailable
       );
-      mediaRecorder.current.removeEventListener('stop', handleStop);
-      mediaRecorder.current.removeEventListener('error', handleError);
+      mediaRecorder.current.removeEventListener("stop", handleStop);
+      mediaRecorder.current.removeEventListener("error", handleError);
       mediaRecorder.current = null;
       clearMediaStream();
     }
@@ -223,13 +225,13 @@ function useMediaRecorder({
   React.useEffect(() => {
     if (!window.MediaRecorder) {
       throw new ReferenceError(
-        'MediaRecorder is not supported in this browser. Please ensure that you are running the latest version of chrome/firefox/edge.'
+        "MediaRecorder is not supported in this browser. Please ensure that you are running the latest version of chrome/firefox/edge."
       );
     }
 
     if (recordScreen && !window.navigator.mediaDevices.getDisplayMedia) {
       throw new ReferenceError(
-        'This browser does not support screen capturing.'
+        "This browser does not support screen capturing."
       );
     }
 
@@ -268,7 +270,7 @@ function useMediaRecorder({
         return new MediaStream(mediaStream.current.getVideoTracks());
       }
       return null;
-    }
+    },
   };
 }
 
